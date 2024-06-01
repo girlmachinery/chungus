@@ -27,7 +27,7 @@ void pm_weapon_stub(game::pmove_t* pm, void* pml)
 	for (int hand = 0; hand < 2; hand++)
 	{
 		if ((pm->ps->weapState[hand].weaponState == 3 || pm->ps->weapState[hand].weaponState == 4)
-			&& pm->ps->sprintState.lastSprintStart > pm->ps->sprintState.lastSprintEnd)//if weaponstate is droppting weapon and is sprinting
+			&& pm->ps->sprintState.lastSprintStart > pm->ps->sprintState.lastSprintEnd)//if weaponstate is dropping weapon and is sprinting
 		{
 			pm->ps->weapState[hand].weapAnim = weaponanimbackup[hand];
 		}
