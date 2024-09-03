@@ -1,35 +1,36 @@
-void pm_weapon_stub(game::pmove_t* pm, void* pml)
-{
+void start_weapon_anim_stub(int localClientNum, int a2, int a3, unsigned int hand, unsigned int anim, float transitiontime) {
+	if ((anim == 38 || anim == 40) && game::mp::cgArray[localClientNum].ps.weapState[hand].weapAnim == 1) {
+		anim = 27;
+		transitiontime = 0.5f;
+	}
+
+	start_weapon_anim_hook.invoke(localClientNum, a2, a3, hand, anim, transitiontime);
+}
+
+bool is_sprinting(game::mp::playerState_s* ps) {
+	return ps->sprintState.lastSprintStart > ps->sprintState.lastSprintEnd;
+}
+
+void pm_weapon_stub(game::pmove_t* pm, void* pml) {
 	if (pm->ps->weapon.data == pm->cmd.weapon.data && (unsigned int)(pm->ps->weapState[0].weaponState - 3) <= 2
-		&& game::PM_Weapon_InValidChangeWeaponState(pm) && !((pm->ps->pm_flags >> 3) & 1)) //game code to check for yys
-	{
-		for (int hand = 0; hand < 2; hand++)
-		{
-			//for glides
-			if (pm->ps->weapState[hand].weapAnim == 30 || pm->ps->weapState[hand].weapAnim == 2078)
-				pm->ps->weapState[hand].weapAnim = 31;
-			else
-				pm->ps->weapState[hand].weapAnim = 1;
- 
- 
+		&& game::PM_Weapon_InValidChangeWeaponState(pm) && !((pm->ps->pm_flags >> 3) & 1)) {
+		for (int hand = 0; hand < 2; hand++) {
+			pm->ps->weapState[hand].weapAnim = 1;
 			pm->ps->weapState[hand].weaponState = 0;
 			pm->ps->weapState[hand].weaponDelay = 0;
 			pm->ps->weapState[hand].weaponTime = 0;
 			pm->ps->weapState[hand].weaponRestrictKickTime = 0;
-			game::BG_ClearDropWeaponAnim(pm->ps);//dont know if its needed but the game does it normally so idk
+			game::BG_ClearDropWeaponAnim(pm->ps);
 		}
 	}
  
-	int weaponanimbackup[2] = { pm->ps->weapState[0].weapAnim, pm->ps->weapState[1].weapAnim };
+	int weapon_anim_backup[2] = { pm->ps->weapState[0].weapAnim, pm->ps->weapState[1].weapAnim };
  
 	pm_weapon_hook->invoke(pm, pml);
  
-	for (int hand = 0; hand < 2; hand++)
-	{
-		if ((pm->ps->weapState[hand].weaponState == 3 || pm->ps->weapState[hand].weaponState == 4)
-			&& pm->ps->sprintState.lastSprintStart > pm->ps->sprintState.lastSprintEnd)//if weaponstate is dropping weapon and is sprinting
-		{
-			pm->ps->weapState[hand].weapAnim = weaponanimbackup[hand];
+	for (int hand = 0; hand < 2; hand++) {
+		if (is_sprinting(pm->ps) && (pm->ps->weapState[hand].weaponState == 3 || pm->ps->weapState[hand].weaponState == 4)) {
+			pm->ps->weapState[hand].weapAnim = weapon_anim_backup[hand];
 		}
 	}
 }
