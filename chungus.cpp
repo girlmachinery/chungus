@@ -36,7 +36,7 @@ void PM_BeginWeaponChange_stub(game::pmove_t* pm, game::Weapon newweapon, bool i
 
 void PM_Weapon_BeginWeaponRaise_stub(game::pmove_t* pm, int, unsigned int, float, int, int hand)
 {
-    utils::hook::invoke<void>(0x140233DB0, pm, hand);
+    utils::hook::invoke<void>(0x140233DB0, pm, hand);//PM_WEAPON_idle
     pm->ps->weapState[hand].weapAnim = 1;
 }
 
